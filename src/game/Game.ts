@@ -4,6 +4,8 @@ import Grid from "./Grid";
 
 export class GameApp extends PIXI.Application {
 
+    grid: Grid;
+
     constructor(parent: HTMLElement, width: number, height: number) {
 
         super({width, height, backgroundColor : 0x000000});
@@ -12,7 +14,7 @@ export class GameApp extends PIXI.Application {
 
         // init Pixi loader
         let loader = new PIXI.Loader();
-        // Add user tile assets
+        // Add tile assets
         let tiles = assets.tiles;
         console.log('tiles to load', assets);
 
@@ -23,16 +25,23 @@ export class GameApp extends PIXI.Application {
 
         // Load assets
         loader.load(this.onAssetsLoaded.bind(this));
-    }
 
+        //update grid position when window resized
+        window.addEventListener("resize", this.onResize.bind(this), false);
+    }
+    private onResize() {
+        if(this.grid) {
+            this.grid.updatePosition();
+        }
+    }
     private onAssetsLoaded() {
 
         // let bgTexture = PIXI.Texture.from(assets.bg);
         // let bg = new PIXI.Sprite(bgTexture);
         // this.app.stage.addChild(bg);
 
-        let grid: Grid = new Grid();
-        this.stage.addChild(grid);    
+        this.grid = new Grid();
+        this.stage.addChild(this.grid);    
     }
 
 }
