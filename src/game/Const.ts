@@ -12,6 +12,11 @@ export const GRID_SIZE = {
 }
 
 /**
+ * Mines count in map
+ */
+export const MINES_COUNT: number = 10;
+
+/**
  * The original tile size in pixel in assets
  */
 export const ORITIN_TILE_SIZE: number = 216;
@@ -27,7 +32,7 @@ export const TILE_SIZE: number = isMobile ? 64 : 64;
 export enum TILE_STATE {
     KNOWN = 0,//Number from 0-8
     FLAG = 9,
-    BOMB = 10,
+    MINE = 10,
     UNKNOWN = 11,
     OTHER = -1
 }

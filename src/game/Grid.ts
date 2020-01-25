@@ -1,6 +1,6 @@
 import * as PIXI from "pixi.js";
 import Tile from './Tile';
-import { GRID_SIZE, TILE_SIZE, isMobile, TILE_STATE } from "./Const";
+import { GRID_SIZE, TILE_SIZE, isMobile, TILE_STATE, MINES_COUNT } from "./Const";
 
 class Grid extends PIXI.Container {
     public readonly  w: number = GRID_SIZE.w;
@@ -12,24 +12,45 @@ class Grid extends PIXI.Container {
 
     constructor() {
         super();
-        this.init();
+        this.initGrid();
+        this.addEvents();
+        this.updatePosition();
     }
-    private init() {
+    private initGrid() {
+        let mines: number[] = this.randomMines();
+        let isMine: boolean = false;
         for(let i: number = 0; i < this.w; i++) {
             this.tiles[i] = [];
             for(let j: number = 0; j < this.h; j++) {
-                let tile:Tile = new Tile(i, j);
+                //check if this is a random mine tile
+                isMine = mines.indexOf(i + j * this.w) > -1;
+                //new tile
+                let tile:Tile = new Tile(i, j, isMine);
                 this.addChild(tile);
                 this.tiles[i][j] = tile;
             } 
         }
-        this.addEvents();
-        this.updatePosition();
+    }
+    private randomMines(): number[] {
+        let len: number = this.w * this.h;
+
+        let i: number = len, rand;
+        let array: number[] = [];
+        
+        while (0 !== i) {
+            rand = Math.floor(Math.random() * i);
+            i -= 1;
+            if(array.indexOf(rand) > -1) continue;
+            array.push(rand);
+            if(array.length >= MINES_COUNT) break;
+        }
+        
+        return array;
     }
     private addEvents() {
         this.interactive = true;
         let click: string = isMobile ? "tap" : "click";
-        //todo on mobile
+        //TODO on mobile
         let rightClick: string = isMobile ? "todo" : "rightclick";
 
         this.on(click, this.onClick);
@@ -40,18 +61,18 @@ class Grid extends PIXI.Container {
         let tpos = Grid.calTilePos(pos.x, pos.y);
         let tile:Tile = this.tiles[tpos.x][tpos.y];
         if(tile) {
-            tile.setState(TILE_STATE.BOMB);
+            tile.state = TILE_STATE.MINE;
+            console.log("click", tpos.x, tpos.y);
         }
-        console.log("clik", tpos);
     }
     private onRightClick(evt) {
         let pos = evt.data.getLocalPosition(this);
         let tpos = Grid.calTilePos(pos.x, pos.y);
         let tile:Tile = this.tiles[tpos.x][tpos.y];
         if(tile) {
-
+            tile.state = TILE_STATE.FLAG;
+            console.log("right click", tpos.x, tpos.y);
         }
-        console.log("right clik", tpos);
     }
     public updatePosition() {
         let windowWidth: number = window.innerWidth;
