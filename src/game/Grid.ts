@@ -12,6 +12,7 @@ class Grid extends PIXI.Container {
     public readonly wy: number = this.h * TILE_SIZE;
 
     private tiles: Tile[][] = [];
+    private prevTile: Tile;
 
     constructor() {
         super();
@@ -80,17 +81,19 @@ class Grid extends PIXI.Container {
 
         this.on(click, this.onClick);
         this.on(rightClick, this.onRightClick);
+        
+        if(!isMobile) {
+            this.on("mousemove", this.onMouseOver);
+        }
     }
     /**
      * Try to reveal a tile on click
      * @param evt 
      */
     private  onClick(evt) {
-        let pos = evt.data.getLocalPosition(this);
-        let tpos = Grid.calTilePos(pos.x, pos.y);
-        let tile:Tile = this.tiles[tpos.x][tpos.y];
+        let tile:Tile = this.getTileByEvent(evt);
         if(tile && tile.state == TILE_STATE.UNKNOWN) {
-            console.log("click", tpos.x, tpos.y);
+            // console.log("click", tpos.x, tpos.y);
             if(tile.hasMine) {
                 console.log("game over")
             } else {
@@ -103,13 +106,22 @@ class Grid extends PIXI.Container {
      * @param evt 
      */
     private onRightClick(evt) {
-        let pos = evt.data.getLocalPosition(this);
-        let tpos = Grid.calTilePos(pos.x, pos.y);
-        let tile:Tile = this.tiles[tpos.x][tpos.y];
+        let tile:Tile = this.getTileByEvent(evt);
         if(tile) {
             if(tile.state == TILE_STATE.FLAG) tile.state = TILE_STATE.UNKNOWN;
             else if(tile.state == TILE_STATE.UNKNOWN) tile.state = TILE_STATE.FLAG;
-            console.log("right click", tpos.x, tpos.y);
+            // console.log("right click", tpos.x, tpos.y);
+        }
+    }
+    private onMouseOver(evt) {
+        let tile:Tile = this.getTileByEvent(evt);
+        if(this.prevTile == tile) return;
+        if(this.prevTile) {
+            this.prevTile.tint = 0xFFFFFF;
+        }
+        if(tile) {
+            this.prevTile = tile;
+            tile.tint = 0x00FF00;
         }
     }
     /**
@@ -160,6 +172,14 @@ class Grid extends PIXI.Container {
                 this.findBlankNeighbors(nTile);
             }
         }
+    }
+    private getTileByEvent(evt): Tile {
+        let pos = evt.data.getLocalPosition(this);
+        let tpos = Grid.calTilePos(pos.x, pos.y);
+        if(this.isValidTile(tpos.x, tpos.y)) {
+            return this.tiles[tpos.x][tpos.y];
+        }
+        return null;
     }
     /**
      * If tx and ty are with the grid
