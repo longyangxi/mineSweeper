@@ -1,6 +1,11 @@
 import * as PIXI from 'pixi.js';
 import { assets } from '../../assets/loader';
-import { TILE_SIZE, ORITIN_TILE_SIZE, TILE_STATE, isMobile } from "./Const";
+import { TILE_SIZE, TILE_STATE } from "./Const";
+
+/**
+ * The original tile size in pixel in assets
+ */
+export const ORITIN_TILE_SIZE: number = 216;
 
 const TILE_SCALE: number = TILE_SIZE / ORITIN_TILE_SIZE;
 

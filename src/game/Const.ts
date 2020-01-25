@@ -12,19 +12,14 @@ export const GRID_SIZE = {
 }
 
 /**
- * Mines count in map
- */
-export const MINES_COUNT: number = 10;
-
-/**
- * The original tile size in pixel in assets
- */
-export const ORITIN_TILE_SIZE: number = 216;
-
-/**
  * The tile size in pixel in game scene
  */
-export const TILE_SIZE: number = isMobile ? 64 : 64;
+export const TILE_SIZE: number = isMobile ? Math.round(window.innerWidth / GRID_SIZE.w) : 64;
+
+/**
+ * Mines tiles count in map
+ */
+export const MINES_COUNT: number = 10;
 
 /**
  * Several Tile States
@@ -51,7 +46,9 @@ export const NEIGHBOR_TILES = [
     {x: -1, y: 0}
 ];
 
-
+/**
+ * Check if the device is mobile
+ */
 function checkMobile(): boolean {
     let _isMobile: boolean = true;
 
