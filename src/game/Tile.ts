@@ -5,7 +5,7 @@ import { TILE_SIZE, TILE_STATE } from "./Const";
 /**
  * The original tile size in pixel in assets
  */
-export const ORITIN_TILE_SIZE: number = 216;
+export const ORITIN_TILE_SIZE: number = 128;
 
 const TILE_SCALE: number = TILE_SIZE / ORITIN_TILE_SIZE;
 

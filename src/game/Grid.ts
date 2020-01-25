@@ -113,6 +113,10 @@ class Grid extends PIXI.Container {
             // console.log("right click", tpos.x, tpos.y);
         }
     }
+    /**
+     * Mouse over effect on PC
+     * @param evt 
+     */
     private onMouseOver(evt) {
         let tile:Tile = this.getTileByEvent(evt);
         if(this.prevTile == tile) return;
