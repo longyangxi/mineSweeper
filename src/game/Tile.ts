@@ -1,16 +1,6 @@
 import * as PIXI from 'pixi.js';
 import { assets } from '../../assets/loader';
-import { TILE_SIZE, ORITIN_TILE_SIZE } from "./Const";
-/**
- * Several Tile States
- */
-enum TILE_STATE {
-    KNOWN = 0,//Number from 0-8
-    FLAG = 9,
-    BOMB = 10,
-    UNKNOWN = 11,
-    OTHER = -1
-}
+import { TILE_SIZE, ORITIN_TILE_SIZE, TILE_STATE } from "./Const";
 
 const TILE_SCALE: number = TILE_SIZE / ORITIN_TILE_SIZE;
 

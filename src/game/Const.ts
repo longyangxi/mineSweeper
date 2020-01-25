@@ -21,6 +21,17 @@ export const ORITIN_TILE_SIZE: number = 216;
  */
 export const TILE_SIZE: number = isMobile ? 64 : 64;
 
+/**
+ * Several Tile States
+ */
+export enum TILE_STATE {
+    KNOWN = 0,//Number from 0-8
+    FLAG = 9,
+    BOMB = 10,
+    UNKNOWN = 11,
+    OTHER = -1
+}
+
 
 function checkMobile(): boolean {
     let _isMobile: boolean = true;

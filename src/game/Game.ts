@@ -28,6 +28,10 @@ export class GameApp extends PIXI.Application {
 
         //update grid position when window resized
         window.addEventListener("resize", this.onResize.bind(this), false);
+
+        document.oncontextmenu = function() {
+            return false;
+        }
     }
     private onResize() {
         if(this.grid) {
