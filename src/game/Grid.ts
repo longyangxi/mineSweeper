@@ -1,9 +1,12 @@
 import * as PIXI from "pixi.js";
 import Tile from './Tile';
-import { GRID_SIZE, TILE_SIZE, isMobile, TILE_STATE, MINES_COUNT } from "./Const";
+import { GRID_SIZE, TILE_SIZE, isMobile, TILE_STATE, MINES_COUNT, NEIGHBOR_TILES} from "./Const";
 
+/**
+ * The grid container
+ */
 class Grid extends PIXI.Container {
-    public readonly  w: number = GRID_SIZE.w;
+    public readonly w: number = GRID_SIZE.w;
     public readonly h: number = GRID_SIZE.h;
     public readonly wx: number = this.w * TILE_SIZE;
     public readonly wy: number = this.h * TILE_SIZE;
@@ -16,21 +19,40 @@ class Grid extends PIXI.Container {
         this.addEvents();
         this.updatePosition();
     }
+    /**
+     * Initialize the grid tiles
+     */
     private initGrid() {
         let mines: number[] = this.randomMines();
-        let isMine: boolean = false;
-        for(let i: number = 0; i < this.w; i++) {
+        let hasMine: boolean = false;
+        let i:number;
+        let j:number;
+        let tile:Tile;
+        //init tiles
+        for(i = 0; i < this.w; i++) {
             this.tiles[i] = [];
-            for(let j: number = 0; j < this.h; j++) {
+            for(j = 0; j < this.h; j++) {
                 //check if this is a random mine tile
-                isMine = mines.indexOf(i + j * this.w) > -1;
+                hasMine = mines.indexOf(i + j * this.w) > -1;
                 //new tile
-                let tile:Tile = new Tile(i, j, isMine);
+                tile = new Tile(i, j, hasMine);
                 this.addChild(tile);
                 this.tiles[i][j] = tile;
             } 
         }
+        //init numbers
+        for(i = 0; i < this.w; i++) {
+            for(j = 0; j < this.h; j++) {
+                tile = this.tiles[i][j];
+                if(!tile.hasMine) {
+                    tile.minesNumber = this.findMinesAround(tile);
+                }
+            } 
+        }
     }
+    /**
+     * Generate random mines
+     */
     private randomMines(): number[] {
         let len: number = this.w * this.h;
 
@@ -47,6 +69,9 @@ class Grid extends PIXI.Container {
         
         return array;
     }
+    /**
+     * Add click events
+     */
     private addEvents() {
         this.interactive = true;
         let click: string = isMobile ? "tap" : "click";
@@ -56,29 +81,100 @@ class Grid extends PIXI.Container {
         this.on(click, this.onClick);
         this.on(rightClick, this.onRightClick);
     }
+    /**
+     * Try to reveal a tile on click
+     * @param evt 
+     */
     private  onClick(evt) {
         let pos = evt.data.getLocalPosition(this);
         let tpos = Grid.calTilePos(pos.x, pos.y);
         let tile:Tile = this.tiles[tpos.x][tpos.y];
-        if(tile) {
-            tile.state = TILE_STATE.MINE;
+        if(tile && tile.state == TILE_STATE.UNKNOWN) {
             console.log("click", tpos.x, tpos.y);
-        }
+            if(tile.hasMine) {
+                console.log("game over")
+            } else {
+                this.findBlankNeighbors(tile);
+            }
+        } 
     }
+    /**
+     * Show or hide a flag on right click
+     * @param evt 
+     */
     private onRightClick(evt) {
         let pos = evt.data.getLocalPosition(this);
         let tpos = Grid.calTilePos(pos.x, pos.y);
         let tile:Tile = this.tiles[tpos.x][tpos.y];
         if(tile) {
-            tile.state = TILE_STATE.FLAG;
+            if(tile.state == TILE_STATE.FLAG) tile.state = TILE_STATE.UNKNOWN;
+            else if(tile.state == TILE_STATE.UNKNOWN) tile.state = TILE_STATE.FLAG;
             console.log("right click", tpos.x, tpos.y);
         }
     }
+    /**
+     * Update the grid's position on the scene
+     */
     public updatePosition() {
         let windowWidth: number = window.innerWidth;
         let windowHeight: number = window.innerHeight;
         this.position.set((windowWidth - this.wx)/2, (windowHeight - this.wy)/2);
     }
+    /**
+     * Find how many mines around this tile
+     */
+    public findMinesAround(tile: Tile): number {
+        let count: number = 0;
+        let i: number = NEIGHBOR_TILES.length;
+        let nTile: Tile;
+        while(i--){
+            let d = NEIGHBOR_TILES[i];
+            let tx: number = tile.tx + d.x;
+            let ty: number = tile.ty + d.y;
+            if(!this.isValidTile(tx, ty)) continue;
+            nTile = this.tiles[tx][ty];
+            if(nTile.hasMine) count++;
+        }
+        return count;
+    }
+    
+    /**
+     * If this tile is cicked, unreal all the blank neighbors
+     * @param tile 
+     */
+    public findBlankNeighbors(tile: Tile) {
+        tile.state = TILE_STATE.KNOWN;
+        if(tile.minesNumber > 0) return;
+        var i = NEIGHBOR_TILES.length;
+        let nTile: Tile;
+        while(i--){
+            var d = NEIGHBOR_TILES[i];
+            var tx = tile.tx + d.x;
+            var ty = tile.ty + d.y;
+            if(!this.isValidTile(tx, ty)) continue;
+            nTile = this.tiles[tx][ty];
+            if(nTile.hasMine) continue;
+            if(nTile.state == TILE_STATE.KNOWN) continue;
+            nTile.state = TILE_STATE.KNOWN;
+            if(nTile.minesNumber == 0) {
+                this.findBlankNeighbors(nTile);
+            }
+        }
+    }
+    /**
+     * If tx and ty are with the grid
+     * @param tx 
+     * @param ty 
+     */
+    public isValidTile(tx:number, ty:number):boolean
+    {
+        return !(tx < 0 || ty < 0 || tx >= this.w || ty >= this.h);
+    }
+    /**
+     * Give x and y pixel position, calculate the tile index in the grid
+     * @param x 
+     * @param y 
+     */
     public static calTilePos(x: number, y: number) : {x: number, y: number} {
         let tp = {x: Math.floor(x / TILE_SIZE), y: Math.floor(y / TILE_SIZE)};
         return tp;

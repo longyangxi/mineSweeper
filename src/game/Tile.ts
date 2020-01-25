@@ -4,22 +4,29 @@ import { TILE_SIZE, ORITIN_TILE_SIZE, TILE_STATE, isMobile } from "./Const";
 
 const TILE_SCALE: number = TILE_SIZE / ORITIN_TILE_SIZE;
 
+/**
+ * The tile sprite
+ */
 class Tile extends PIXI.AnimatedSprite{
+    /**
+     * If it's a mine
+     */
+    public hasMine: boolean = false;
+
     /**
      * Current tile state
      */
     private _state: TILE_STATE = TILE_STATE.OTHER;
+
     /**
      * The number sign of a known tile
      */
-    private _konwnNumber: number = -1;
+    public minesNumber: number = -1;
 
-    /**
-     * If it's a mine
-     */
-    private _isMine: boolean = false;
+    private _tx:number = -1;
+    private _ty:number = -1;
     
-    constructor(x: number = 0, y: number = 0, isMine: boolean = false) {
+    constructor(x: number = 0, y: number = 0, hasMine: boolean = false) {
         // let tiles = assets.tiles;
         super(assets.tiles.map(path => PIXI.Texture.from(path)));
         this.anchor.set(0.5);
@@ -27,8 +34,8 @@ class Tile extends PIXI.AnimatedSprite{
         this.scale.set(TILE_SCALE);
         this.state = TILE_STATE.UNKNOWN;
         this.setIndex(x, y);
-        this._isMine = isMine;
-        // if(isMine) this.state = TILE_STATE.MINE;
+        this.hasMine = hasMine;
+        // if(hasMine) this.state = TILE_STATE.MINE;
     }
     /**
      * 
@@ -37,12 +44,9 @@ class Tile extends PIXI.AnimatedSprite{
      */
     public set state(s: TILE_STATE) {
         if(this._state == s) return;
-        //todo
-        let n: number = -1
         this._state = s;
         if(s == TILE_STATE.KNOWN) {
-            this.gotoAndStop(n);
-            this._konwnNumber = n;
+            this.gotoAndStop(this.minesNumber);
         } else {
             this.gotoAndStop(s);
         }
@@ -51,15 +55,17 @@ class Tile extends PIXI.AnimatedSprite{
     {
         return this._state;
     }
-    public get knownNumber():number
+    public get tx(): number
     {
-        return this._konwnNumber;
+        return this._tx;
     }
-    public get isMine():boolean
+    public get ty(): number
     {
-        return this._isMine;
+        return this._ty;
     }
     public setIndex(x: number, y: number) {
+        this._tx = x;
+        this._ty = y;
         x += 0.5;
         y += 0.5;
         this.position.set(TILE_SIZE * x, TILE_SIZE * y)

@@ -2,7 +2,10 @@ import { assets } from '../../assets/loader';
 import * as PIXI from 'pixi.js';
 import Grid from "./Grid";
 
-export class GameApp extends PIXI.Application {
+/**
+ * The game
+ */
+export class Game extends PIXI.Application {
 
     grid: Grid;
 
