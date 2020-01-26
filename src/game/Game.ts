@@ -15,11 +15,13 @@ enum GameState {
  */
 export class Game extends PIXI.Application {
     public gameState: GameState = GameState.IDLE;
-    grid: Grid;
-    mines: number = MINES_COUNT;
-    minesTxt: PIXI.Text;
-    timeTxt: PIXI.Text;
-    timer: number = -1;
+    private grid: Grid;
+    private mines: number = MINES_COUNT;
+    private minesTxt: PIXI.Text;
+    private timeTxt: PIXI.Text;
+    private playedTime: number = 0;
+    private timer: number = -1;
+    private score: number = 0;
 
     constructor(parent: HTMLElement, width: number, height: number) {
 
@@ -96,43 +98,48 @@ export class Game extends PIXI.Application {
         this.grid.on("onFlag" , this.updateMinesCount.bind(this))
         this.grid.on("onUnFlag", this.updateMinesCount.bind(this))
         this.grid.on("onGameOver", this.onGameOver.bind(this));
-        this.grid.on("onRestart", this.restartGame.bind(this));
+        this.grid.on("onGameEnd", this.onGameEnd.bind(this));
     }
     removeEvents() {
         this.grid.removeListener("onSolve", this.onSolve.bind(this));
         this.grid.removeListener("onFlag" , this.updateMinesCount.bind(this))
         this.grid.removeListener("onUnFlag", this.updateMinesCount.bind(this))
         this.grid.removeListener("onGameOver", this.onGameOver.bind(this));
-        this.grid.removeListener("onRestart", this.restartGame.bind(this));
+        this.grid.removeListener("onGameEnd", this.onGameEnd.bind(this));
     }
-    onSolve(tile:Tile) {
+    onSolve(count: number) {
         if(this.gameState == GameState.IDLE) {
             this.gameState = GameState.PLAY;
             this.startTimer();
         }
+        //Simple calculate the score based on the revealed count
+        this.score += count * count;
     }
-    onGameOver() {
-        alert("Game Over!")
+    onGameOver(win: boolean) {
+        if(!win) this.score = 0;
         this.gameState = GameState.OVER;
         clearInterval(this.timer);
         this.timeTxt.text = "Time: 0";
         this.timer = -1;
     }
-    restartGame(score: number = 0) {
-        alert(score ?  "You win, play again?" : "You fail, play again?")
+    onGameEnd() {
+        alert(this.score > 0 ?  "You got score: " + this.score + " , play again?" : "You fail, play again?")
         this.removeEvents();
         this.grid = null;
+        this.score = 0;
+        this.playedTime = 0;
         this.gameState = GameState.IDLE;
         this.mines = MINES_COUNT;
         this.grid = new Grid();
         this.stage.addChild(this.grid);  
         this.addEvents();
+        this.minesTxt.text = "Mines: " +  this.mines
     }
 
     startTimer() {
-        let time:number = 0;
+        this.playedTime = 0;
         this.timer = setInterval(()=> {
-            this.timeTxt.text = "Time: " + (++time);
+            this.timeTxt.text = "Time: " + (++this.playedTime);
         }, 1000);
     }
     updateMinesCount(flag: boolean) {
