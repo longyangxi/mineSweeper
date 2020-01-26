@@ -52,7 +52,7 @@ export const NEIGHBOR_TILES = [
 ];
 
 export const BACKGROUND = {
-    color: 0x595959,
+    color: 0x595959,//0x222222
     border:  10,
     top: 64
 }

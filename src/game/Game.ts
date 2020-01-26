@@ -67,16 +67,21 @@ export class Game extends PIXI.Application {
         this.stage.addChild(title);
 
         //Time text
-        const time = new PIXI.Text('Time: 0', textStyle);
-        time.x = title.x + 250;
-        time.y = title.y + 5;
-        this.stage.addChild(time);
+        const timeText = new PIXI.Text('Time: 0', textStyle);
+        timeText.x = title.x + 250;
+        timeText.y = title.y + 5;
+        this.stage.addChild(timeText);
 
         //Mines text
         const mines = new PIXI.Text('Mines: ' + MINES_COUNT, textStyle);
-        mines.x = time.x + 150;
-        mines.y = time.y;
+        mines.x = timeText.x + 150;
+        mines.y = timeText.y;
         this.stage.addChild(mines);
+
+        let time:number = 0;
+        let sid:number = setInterval(()=> {
+            timeText.text = "Time: " + (++time);
+        }, 1000);
     }
 
 }
