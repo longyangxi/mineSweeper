@@ -15,6 +15,7 @@ class Grid extends PIXI.Container {
 
     private tiles: Tile[][] = [];
     private prevTile: Tile;
+    private tempIndex: number = 0;
 
     constructor() {
         super();
@@ -99,7 +100,9 @@ class Grid extends PIXI.Container {
             if(tile.hasMine) {
                 console.log("game over")
             } else {
-                this.findBlankNeighbors(tile);
+                this.tempIndex = 0;
+                let texture = PIXI.Texture.from(assets.broken);
+                this.findBlankNeighbors(tile, texture);
             }
         }
     }
@@ -160,10 +163,10 @@ class Grid extends PIXI.Container {
      * If this tile is cicked, unreal all the blank neighbors
      * @param tile 
      */
-    public findBlankNeighbors(tile: Tile) {
-        let texture = PIXI.Texture.from(assets.broken);
+    public findBlankNeighbors(tile: Tile, texture: PIXI.Texture) {
+        let delay: number = 20*this.tempIndex++;
+        if(tile.state != TILE_STATE.KNOWN) Particle.show(this, texture, tile.position, delay)
         tile.state = TILE_STATE.KNOWN;
-        new Particle(this, texture).show(tile.position);
         if(tile.minesNumber > 0) return;
         var i = NEIGHBOR_TILES.length;
         let nTile: Tile;
@@ -176,10 +179,10 @@ class Grid extends PIXI.Container {
             if(nTile.hasMine) continue;
             if(nTile.state == TILE_STATE.KNOWN) continue;
             nTile.state = TILE_STATE.KNOWN;
-            // new Particle(this, texture).show(evt.data.getLocalPosition(this));
-            new Particle(this, texture).show(tile.position);
+            delay = 20*this.tempIndex++;
+            Particle.show(this, texture, nTile.position, delay)
             if(nTile.minesNumber == 0) {
-                this.findBlankNeighbors(nTile);
+                this.findBlankNeighbors(nTile, texture);
             }
         }
     }
