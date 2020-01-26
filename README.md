@@ -1,6 +1,9 @@
 # mineSweeper
 A mineSweeper game based on PIXI.js and TypeScript
+
+# test
 npm run start
+
 http://127.0.0.1:1234/
 
 # assets
