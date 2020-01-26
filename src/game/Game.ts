@@ -25,6 +25,7 @@ export class Game extends PIXI.Application {
             loader.add(path);
         })
         loader.add(assets.bg);
+        loader.add(assets.broken);
 
         // Load assets
         loader.load(this.onAssetsLoaded.bind(this));

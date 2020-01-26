@@ -1,5 +1,7 @@
 import * as PIXI from "pixi.js";
 import Tile from './Tile';
+import Particle from "./Particle";
+import { assets } from "../../assets/loader";
 import { GRID_SIZE, TILE_SIZE, isMobile, TILE_STATE, MINES_COUNT, NEIGHBOR_TILES} from "./Const";
 
 /**
@@ -99,7 +101,7 @@ class Grid extends PIXI.Container {
             } else {
                 this.findBlankNeighbors(tile);
             }
-        } 
+        }
     }
     /**
      * Show or hide a flag on right click
@@ -159,7 +161,9 @@ class Grid extends PIXI.Container {
      * @param tile 
      */
     public findBlankNeighbors(tile: Tile) {
+        let texture = PIXI.Texture.from(assets.broken);
         tile.state = TILE_STATE.KNOWN;
+        new Particle(this, texture).show(tile.position);
         if(tile.minesNumber > 0) return;
         var i = NEIGHBOR_TILES.length;
         let nTile: Tile;
@@ -172,6 +176,8 @@ class Grid extends PIXI.Container {
             if(nTile.hasMine) continue;
             if(nTile.state == TILE_STATE.KNOWN) continue;
             nTile.state = TILE_STATE.KNOWN;
+            // new Particle(this, texture).show(evt.data.getLocalPosition(this));
+            new Particle(this, texture).show(tile.position);
             if(nTile.minesNumber == 0) {
                 this.findBlankNeighbors(nTile);
             }
