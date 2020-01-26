@@ -1,6 +1,7 @@
 import * as PIXI from 'pixi.js';
 import { assets } from '../../assets/loader';
 import { TILE_SIZE, TILE_STATE } from "./Const";
+import Particle from "./Particle";
 
 /**
  * The original tile size in pixel in assets
@@ -53,16 +54,23 @@ class Tile extends PIXI.AnimatedSprite{
             this.gotoAndStop(this.minesNumber);
         } else {
             this.gotoAndStop(s);
+            if(s == TILE_STATE.UNKNOWN) {
+                let texture: PIXI.Texture = PIXI.Texture.from(assets.flag);
+                Particle.show(this.parent, texture, this.position);
+            }
         }
     }
     public delayState(s: TILE_STATE, delay: number) {
+        let texture: PIXI.Texture = PIXI.Texture.from(assets.rect);
         this._state = s;
         if(delay > 0) {
             setTimeout(() => {
                 this.state = s;
+                Particle.show(this.parent, texture, this.position)
             }, delay);
         } else {
             this.state = s;
+            Particle.show(this.parent, texture, this.position)
         }
     }
     public get state():TILE_STATE

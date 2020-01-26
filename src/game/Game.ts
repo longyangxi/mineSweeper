@@ -3,13 +3,23 @@ import * as PIXI from 'pixi.js';
 import Grid from "./Grid";
 import { BACKGROUND, TILE_SIZE, MINES_COUNT} from "./Const";
 import {titleStyle, textStyle} from "./TextStyle";
+import Tile from './Tile';
 
+enum GameState {
+    IDLE,
+    PLAY,
+    OVER
+}
 /**
  * The game
  */
 export class Game extends PIXI.Application {
-
+    public gameState: GameState = GameState.IDLE;
     grid: Grid;
+    mines: number = MINES_COUNT;
+    minesTxt: PIXI.Text;
+    timeTxt: PIXI.Text;
+    timer: number = -1;
 
     constructor(parent: HTMLElement, width: number, height: number) {
 
@@ -67,21 +77,46 @@ export class Game extends PIXI.Application {
         this.stage.addChild(title);
 
         //Time text
-        const timeText = new PIXI.Text('Time: 0', textStyle);
-        timeText.x = title.x + 250;
-        timeText.y = title.y + 5;
-        this.stage.addChild(timeText);
+        this.timeTxt = new PIXI.Text('Time: 0', textStyle);
+        this.timeTxt.x = title.x + 250;
+        this.timeTxt.y = title.y + 5;
+        this.stage.addChild(this.timeTxt);
 
         //Mines text
-        const mines = new PIXI.Text('Mines: ' + MINES_COUNT, textStyle);
-        mines.x = timeText.x + 150;
-        mines.y = timeText.y;
-        this.stage.addChild(mines);
+        this.minesTxt = new PIXI.Text('Mines: ' + this.mines, textStyle);
+        this.minesTxt.x = this.timeTxt.x + 150;
+        this.minesTxt.y = this.timeTxt.y;
+        this.stage.addChild(this.minesTxt);
 
+        //Events
+        this.grid.on("onSolve", this.onSolve.bind(this));
+        this.grid.on("onFlag" , this.updateMinesCount.bind(this))
+        this.grid.on("onUnFlag", this.updateMinesCount.bind(this))
+        this.grid.on("onGameOver", this.onGameOver.bind(this));
+    }
+    onSolve(tile:Tile) {
+        if(this.gameState == GameState.IDLE) {
+            this.gameState = GameState.PLAY;
+            this.startTimer();
+        }
+    }
+    onGameOver() {
+        alert("Game Over!")
+        this.gameState = GameState.OVER;
+        clearInterval(this.timer);
+        this.timer = -1;
+    }
+    startTimer() {
         let time:number = 0;
-        let sid:number = setInterval(()=> {
-            timeText.text = "Time: " + (++time);
+        this.timer = setInterval(()=> {
+            this.timeTxt.text = "Time: " + (++time);
         }, 1000);
+    }
+    updateMinesCount(flag: boolean) {
+        flag ? this.mines -- : this.mines ++;
+        if(this.mines < 0) this.mines = 0;
+        else if(this.mines > MINES_COUNT) this.mines = MINES_COUNT;
+        this.minesTxt.text = "Mines: " +  this.mines;
     }
 
 }

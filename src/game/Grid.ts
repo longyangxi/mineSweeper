@@ -1,6 +1,5 @@
 import * as PIXI from "pixi.js";
 import Tile from './Tile';
-import Particle from "./Particle";
 import { assets } from "../../assets/loader";
 import { GRID_SIZE, TILE_SIZE, isMobile, TILE_STATE, MINES_COUNT, NEIGHBOR_TILES, TILE_PARTILCE_DELAY} from "./Const";
 
@@ -14,8 +13,10 @@ class Grid extends PIXI.Container {
     public readonly hx: number = this.h * TILE_SIZE;
 
     private tiles: Tile[][] = [];
+    private mineTiles: Tile[] = [];
     private prevTile: Tile;
     private tempDelay: number = 0;
+    private gameIsOver: boolean = false;
 
     constructor() {
         super();
@@ -40,6 +41,7 @@ class Grid extends PIXI.Container {
                 hasMine = mines.indexOf(i + j * this.w) > -1;
                 //new tile
                 tile = new Tile(i, j, hasMine);
+                if(hasMine) this.mineTiles.push(tile);
                 this.addChild(tile);
                 this.tiles[i][j] = tile;
             } 
@@ -89,6 +91,39 @@ class Grid extends PIXI.Container {
             this.on("mousemove", this.onMouseOver);
         }
     }
+    private removeEvents() {
+        this.interactive = false;
+        let click: string = isMobile ? "tap" : "click";
+        //TODO on mobile
+        let rightClick: string = isMobile ? "todo" : "rightclick";
+
+        this.removeListener(click, this.onClick);
+        this.removeListener(rightClick, this.onRightClick);
+        
+        if(!isMobile) {
+            this.removeListener("mousemove", this.onMouseOver);
+        }
+    }
+    private gameOver() {
+        this.gameIsOver = true;
+        if(this.prevTile) {
+            this.prevTile.tint = 0xFFFFFF;
+            this.prevTile = null;
+        }
+        this.emit("onGameOver");
+        this.removeEvents();
+        this.revealAllMines();
+    }
+    private revealAllMines() {
+        for(let i: number = 0; i < this.mineTiles.length; i++) {
+            let tile: Tile = this.mineTiles[i];
+            if(tile.state != TILE_STATE.FLAG) {
+                tile.delayState(TILE_STATE.MINE, i * 100);
+            }
+        }
+        this.tiles = [];
+        this.mineTiles = [];
+    }
     /**
      * Try to reveal a tile on click
      * @param evt 
@@ -96,13 +131,12 @@ class Grid extends PIXI.Container {
     private  onClick(evt) {
         let tile:Tile = this.getTileByEvent(evt);
         if(tile && tile.state == TILE_STATE.UNKNOWN) {
-            // console.log("click", tpos.x, tpos.y);
             if(tile.hasMine) {
-                console.log("game over")
+                this.gameOver();
             } else {
                 this.tempDelay = 0;
-                let texture = PIXI.Texture.from(assets.rect);
-                this.findBlankNeighbors(tile, texture);
+                this.findBlankNeighbors(tile);
+                this.emit("onSolve", tile)
             }
         }
     }
@@ -115,11 +149,11 @@ class Grid extends PIXI.Container {
         if(tile) {
             if(tile.state == TILE_STATE.FLAG) {
                 tile.state = TILE_STATE.UNKNOWN;
-                let texture = PIXI.Texture.from(assets.flag);
-                Particle.show(this, texture, tile.position, this.tempDelay);
+                this.emit("onUnFlag", false)
+            } else if(tile.state == TILE_STATE.UNKNOWN) {
+                tile.state = TILE_STATE.FLAG;
+                this.emit("onFlag", true)
             }
-            else if(tile.state == TILE_STATE.UNKNOWN) tile.state = TILE_STATE.FLAG;
-            // console.log("right click", tpos.x, tpos.y);
         }
     }
     /**
@@ -167,10 +201,9 @@ class Grid extends PIXI.Container {
      * If this tile is cicked, unreal all the blank neighbors
      * @param tile 
      */
-    public findBlankNeighbors(tile: Tile, texture: PIXI.Texture) {
+    public findBlankNeighbors(tile: Tile) {
         if(tile.state != TILE_STATE.KNOWN) {
             this.tempDelay += TILE_PARTILCE_DELAY;
-            Particle.show(this, texture, tile.position, this.tempDelay);
             tile.delayState(TILE_STATE.KNOWN, this.tempDelay)
         }
         if(tile.minesNumber > 0) return;
@@ -186,9 +219,8 @@ class Grid extends PIXI.Container {
             if(nTile.state == TILE_STATE.KNOWN) continue;
             this.tempDelay += TILE_PARTILCE_DELAY;
             nTile.delayState(TILE_STATE.KNOWN, this.tempDelay)
-            Particle.show(this, texture, nTile.position, this.tempDelay)
             if(nTile.minesNumber == 0) {
-                this.findBlankNeighbors(nTile, texture);
+                this.findBlankNeighbors(nTile);
             }
         }
     }
