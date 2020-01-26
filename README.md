@@ -6,6 +6,9 @@ npm run start
 
 http://127.0.0.1:1234/
 
+# preview
+
+
 # assets
 https://opengameart.org/content/minesweeper-tile-set
 
