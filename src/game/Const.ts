@@ -13,6 +13,11 @@ export const GRID_SIZE = {
     h: 9
 }
 
+/**
+ * Mines tiles count in map
+ */
+export const MINES_COUNT: number = 10;
+
 export const BACKGROUND = {
     color: 0x595959,//0x222222
     border:  10,
@@ -23,11 +28,6 @@ export const BACKGROUND = {
  * The tile size in pixel in game scene
  */
 export const TILE_SIZE: number = isMobile ? Math.round((window.innerWidth - 2 * BACKGROUND.border) / GRID_SIZE.w) : 64;
-
-/**
- * Mines tiles count in map
- */
-export const MINES_COUNT: number = 10;
 
 /**
  * Tile particle delay (ms)
