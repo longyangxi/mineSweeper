@@ -2,7 +2,7 @@
 A mineSweeper game based on PIXI.js and TypeScript
 
 # preview
-![Aaron Swartz](https://raw.githubusercontent.com/longyangxi/mineSweeper/master/preview.png?token=AA2RPNLDZGF63DKBKMQA6QK6FVW5O)
+![Aaron Swartz](https://raw.githubusercontent.com/longyangxi/mineSweeper/master/preview.jpeg?token=AA2RPNPXYGCI3TKBW6BPPLC6FVXJW)
 
 # test
 npm run start
