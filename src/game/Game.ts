@@ -1,9 +1,7 @@
 import { assets } from '../../assets/loader';
 import * as PIXI from 'pixi.js';
 import Grid from "./Grid";
-import { BACKGROUND, TILE_SIZE, MINES_COUNT} from "./Const";
-import {titleStyle, textStyle} from "./TextStyle";
-import Tile from './Tile';
+import { BACKGROUND, MINES_COUNT, titleStyle, textStyle} from "./Const";
 
 enum GameState {
     IDLE,

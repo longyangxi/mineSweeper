@@ -14,7 +14,7 @@ class Grid extends PIXI.Container {
 
     private tiles: Tile[][] = [];
     private mineTiles: Tile[] = [];
-    private prevTile: Tile;
+    private prevActiveTile: Tile;
     private tempDelay: number = 0;
     private totalReavealed: number = 0;
     private onceRevealed: number = 0;
@@ -106,9 +106,9 @@ class Grid extends PIXI.Container {
         }
     }
     private gameOver(win: boolean, delay: number) {
-        if(this.prevTile) {
-            this.prevTile.tint = 0xFFFFFF;
-            this.prevTile = null;
+        if(this.prevActiveTile) {
+            this.prevActiveTile.tint = 0xFFFFFF;
+            this.prevActiveTile = null;
         }
         this.emit("onGameOver", win);
         this.removeEvents();
@@ -126,7 +126,7 @@ class Grid extends PIXI.Container {
         for(i = 0; i < this.mineTiles.length; i++) {
             let tile: Tile = this.mineTiles[i];
             if(tile.state == TILE_STATE.UNKNOWN) {
-                tile.delayState(TILE_STATE.MINE, (i + 1) * delay);
+                tile.delayState(TILE_STATE.MINE, 500 + (i + 1) * delay);
             }
         }
     }
@@ -140,7 +140,14 @@ class Grid extends PIXI.Container {
             if(tile.hasMine) {
                 //failed
                 tile.delayState(TILE_STATE.MINE, 0);
-                this.gameOver(false, this.mineTiles.length * TILE_PARTILCE_DELAY + 1000);
+                //hilight the error
+                if(this.prevActiveTile == tile) this.prevActiveTile = null;
+                tile.tint = 0xFF0000;
+                setTimeout(() => {
+                    tile.tint = 0xFFFFFF;
+                }, 500);
+                //game fail
+                this.gameOver(false, this.mineTiles.length * TILE_PARTILCE_DELAY + 1500);
             } else {
                 this.tempDelay = 0;
                 this.onceRevealed = 0;
@@ -176,12 +183,12 @@ class Grid extends PIXI.Container {
      */
     private onMouseOver(evt) {
         let tile:Tile = this.getTileByEvent(evt);
-        if(this.prevTile == tile) return;
-        if(this.prevTile) {
-            this.prevTile.tint = 0xFFFFFF;
+        if(this.prevActiveTile == tile) return;
+        if(this.prevActiveTile) {
+            this.prevActiveTile.tint = 0xFFFFFF;
         }
         if(tile) {
-            this.prevTile = tile;
+            this.prevActiveTile = tile;
             tile.tint = 0x00FF00;
         }
     }
