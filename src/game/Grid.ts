@@ -2,7 +2,7 @@ import * as PIXI from "pixi.js";
 import Tile from './Tile';
 import Particle from "./Particle";
 import { assets } from "../../assets/loader";
-import { GRID_SIZE, TILE_SIZE, isMobile, TILE_STATE, MINES_COUNT, NEIGHBOR_TILES} from "./Const";
+import { GRID_SIZE, TILE_SIZE, isMobile, TILE_STATE, MINES_COUNT, NEIGHBOR_TILES, TILE_PARTILCE_DELAY} from "./Const";
 
 /**
  * The grid container
@@ -164,9 +164,11 @@ class Grid extends PIXI.Container {
      * @param tile 
      */
     public findBlankNeighbors(tile: Tile, texture: PIXI.Texture) {
-        let delay: number = 20*this.tempIndex++;
-        if(tile.state != TILE_STATE.KNOWN) Particle.show(this, texture, tile.position, delay)
-        tile.state = TILE_STATE.KNOWN;
+        let delay: number = TILE_PARTILCE_DELAY * this.tempIndex++;
+        if(tile.state != TILE_STATE.KNOWN) {
+            Particle.show(this, texture, tile.position, delay);
+            tile.delayState(TILE_STATE.KNOWN, delay)
+        }
         if(tile.minesNumber > 0) return;
         var i = NEIGHBOR_TILES.length;
         let nTile: Tile;
@@ -178,8 +180,8 @@ class Grid extends PIXI.Container {
             nTile = this.tiles[tx][ty];
             if(nTile.hasMine) continue;
             if(nTile.state == TILE_STATE.KNOWN) continue;
-            nTile.state = TILE_STATE.KNOWN;
-            delay = 20*this.tempIndex++;
+            delay = TILE_PARTILCE_DELAY * this.tempIndex++;
+            nTile.delayState(TILE_STATE.KNOWN, delay)
             Particle.show(this, texture, nTile.position, delay)
             if(nTile.minesNumber == 0) {
                 this.findBlankNeighbors(nTile, texture);

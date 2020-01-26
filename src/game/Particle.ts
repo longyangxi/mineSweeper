@@ -18,7 +18,6 @@ class Particle extends Particles.Emitter
     public static show(container: PIXI.Container, texture: PIXI.Texture, pos: {x: number, y: number}, delay: number = 0) {
         if(delay > 0) {
             setTimeout(() => {
-                console.log("fuck....", delay)
                 let particle: Particle = new Particle(container, texture);
                 particle.show(pos);
             }, delay);

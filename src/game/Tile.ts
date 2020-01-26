@@ -48,12 +48,21 @@ class Tile extends PIXI.AnimatedSprite{
      * @param n number if it's known tile, the number on it
      */
     public set state(s: TILE_STATE) {
-        if(this._state == s) return;
         this._state = s;
         if(s == TILE_STATE.KNOWN) {
             this.gotoAndStop(this.minesNumber);
         } else {
             this.gotoAndStop(s);
+        }
+    }
+    public delayState(s: TILE_STATE, delay: number) {
+        this._state = s;
+        if(delay > 0) {
+            setTimeout(() => {
+                this.state = s;
+            }, delay);
+        } else {
+            this.state = s;
         }
     }
     public get state():TILE_STATE

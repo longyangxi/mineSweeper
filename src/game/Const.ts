@@ -22,6 +22,11 @@ export const TILE_SIZE: number = isMobile ? Math.round(window.innerWidth / GRID_
 export const MINES_COUNT: number = 10;
 
 /**
+ * Tile particle delay (ms)
+ */
+export const TILE_PARTILCE_DELAY: number = 20;
+
+/**
  * Several Tile States
  */
 export enum TILE_STATE {
