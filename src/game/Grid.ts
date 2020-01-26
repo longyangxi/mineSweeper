@@ -104,7 +104,7 @@ class Grid extends PIXI.Container {
             this.removeListener("mousemove", this.onMouseOver);
         }
     }
-    private gameOver() {
+    private gameOver(tile: Tile) {
         this.gameIsOver = true;
         if(this.prevTile) {
             this.prevTile.tint = 0xFFFFFF;
@@ -112,17 +112,23 @@ class Grid extends PIXI.Container {
         }
         this.emit("onGameOver");
         this.removeEvents();
-        this.revealAllMines();
+        this.revealAllMines(tile);
     }
-    private revealAllMines() {
-        for(let i: number = 0; i < this.mineTiles.length; i++) {
+    private revealAllMines(tile:Tile) {
+        const delay: number = 100;
+        let i: number;
+        tile.state = TILE_STATE.MINE;
+        for(i = 0; i < this.mineTiles.length; i++) {
             let tile: Tile = this.mineTiles[i];
-            if(tile.state != TILE_STATE.FLAG) {
-                tile.delayState(TILE_STATE.MINE, i * 100);
+            if(tile.state == TILE_STATE.UNKNOWN) {
+                tile.delayState(TILE_STATE.MINE, i * delay);
             }
         }
         this.tiles = [];
         this.mineTiles = [];
+        setTimeout(() => {
+            this.emit("onRestart");
+        }, i * delay + 2000);
     }
     /**
      * Try to reveal a tile on click
@@ -132,7 +138,7 @@ class Grid extends PIXI.Container {
         let tile:Tile = this.getTileByEvent(evt);
         if(tile && tile.state == TILE_STATE.UNKNOWN) {
             if(tile.hasMine) {
-                this.gameOver();
+                this.gameOver(tile);
             } else {
                 this.tempDelay = 0;
                 this.findBlankNeighbors(tile);

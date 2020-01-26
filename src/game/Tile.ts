@@ -49,16 +49,17 @@ class Tile extends PIXI.AnimatedSprite{
      * @param n number if it's known tile, the number on it
      */
     public set state(s: TILE_STATE) {
-        this._state = s;
         if(s == TILE_STATE.KNOWN) {
             this.gotoAndStop(this.minesNumber);
         } else {
             this.gotoAndStop(s);
-            if(s == TILE_STATE.UNKNOWN) {
+            //show flag drop effect
+            if(this._state == TILE_STATE.FLAG) {
                 let texture: PIXI.Texture = PIXI.Texture.from(assets.flag);
                 Particle.show(this.parent, texture, this.position);
             }
         }
+        this._state = s;
     }
     public delayState(s: TILE_STATE, delay: number) {
         let texture: PIXI.Texture = PIXI.Texture.from(assets.rect);

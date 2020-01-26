@@ -89,10 +89,21 @@ export class Game extends PIXI.Application {
         this.stage.addChild(this.minesTxt);
 
         //Events
+        this.addEvents();
+    }
+    addEvents() {
         this.grid.on("onSolve", this.onSolve.bind(this));
         this.grid.on("onFlag" , this.updateMinesCount.bind(this))
         this.grid.on("onUnFlag", this.updateMinesCount.bind(this))
         this.grid.on("onGameOver", this.onGameOver.bind(this));
+        this.grid.on("onRestart", this.restartGame.bind(this));
+    }
+    removeEvents() {
+        this.grid.removeListener("onSolve", this.onSolve.bind(this));
+        this.grid.removeListener("onFlag" , this.updateMinesCount.bind(this))
+        this.grid.removeListener("onUnFlag", this.updateMinesCount.bind(this))
+        this.grid.removeListener("onGameOver", this.onGameOver.bind(this));
+        this.grid.removeListener("onRestart", this.restartGame.bind(this));
     }
     onSolve(tile:Tile) {
         if(this.gameState == GameState.IDLE) {
@@ -104,8 +115,20 @@ export class Game extends PIXI.Application {
         alert("Game Over!")
         this.gameState = GameState.OVER;
         clearInterval(this.timer);
+        this.timeTxt.text = "Time: 0";
         this.timer = -1;
     }
+    restartGame(score: number = 0) {
+        alert(score ?  "You win, play again?" : "You fail, play again?")
+        this.removeEvents();
+        this.grid = null;
+        this.gameState = GameState.IDLE;
+        this.mines = MINES_COUNT;
+        this.grid = new Grid();
+        this.stage.addChild(this.grid);  
+        this.addEvents();
+    }
+
     startTimer() {
         let time:number = 0;
         this.timer = setInterval(()=> {
