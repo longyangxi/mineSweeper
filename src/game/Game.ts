@@ -43,6 +43,8 @@ export class Game extends PIXI.Application {
         }
     }
     private onAssetsLoaded() {
+        //hide loading
+        if(document.getElementById("gameLoading")) document.body.removeChild(document.getElementById("gameLoading"));
 
         // let bgTexture = PIXI.Texture.from(assets.bg);
         // let bg = new PIXI.Sprite(bgTexture);
