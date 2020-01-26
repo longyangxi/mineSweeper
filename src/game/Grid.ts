@@ -117,11 +117,11 @@ class Grid extends PIXI.Container {
     private revealAllMines(tile:Tile) {
         const delay: number = 100;
         let i: number;
-        tile.state = TILE_STATE.MINE;
+        tile.delayState(TILE_STATE.MINE, 0);
         for(i = 0; i < this.mineTiles.length; i++) {
-            let tile: Tile = this.mineTiles[i];
+            tile = this.mineTiles[i];
             if(tile.state == TILE_STATE.UNKNOWN) {
-                tile.delayState(TILE_STATE.MINE, i * delay);
+                tile.delayState(TILE_STATE.MINE, (i + 1) * delay);
             }
         }
         this.tiles = [];
