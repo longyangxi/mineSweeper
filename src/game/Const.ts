@@ -13,10 +13,16 @@ export const GRID_SIZE = {
     h: 9
 }
 
+export const BACKGROUND = {
+    color: 0x595959,//0x222222
+    border:  10,
+    top: 64
+}
+
 /**
  * The tile size in pixel in game scene
  */
-export const TILE_SIZE: number = isMobile ? Math.round(window.innerWidth / GRID_SIZE.w) : 64;
+export const TILE_SIZE: number = isMobile ? Math.round((window.innerWidth - 2 * BACKGROUND.border) / GRID_SIZE.w) : 64;
 
 /**
  * Mines tiles count in map
@@ -53,33 +59,27 @@ export const NEIGHBOR_TILES = [
     {x: -1, y: 0}
 ];
 
-export const BACKGROUND = {
-    color: 0x595959,//0x222222
-    border:  10,
-    top: 64
-}
-
 export const titleStyle = new PIXI.TextStyle({
     fontFamily: 'Arial',
-    fontSize: 30,
+    fontSize: isMobile ? 20 : 30,
     fontWeight: 'bold',
     fill: ['#ffffff', '#00ff00'],
     stroke: '#4a1850',
-    strokeThickness: 5,
+    strokeThickness: isMobile ? 3 : 5,
     dropShadow: true,
     dropShadowColor: '#000000',
-    dropShadowBlur: 4,
+    dropShadowBlur: isMobile ? 3 : 6,
     dropShadowAngle: Math.PI / 6,
-    dropShadowDistance: 6
+    dropShadowDistance: isMobile ? 3 : 6
 });
 
 export const textStyle = new PIXI.TextStyle({
     fontFamily: 'Arial',
-    fontSize: 26,
+    fontSize: isMobile ? 18 : 26,
     fontWeight: 'bold',
     fill: ['#ffffff', '#cccccc'],
     stroke: '#333333',
-    strokeThickness: 5
+    strokeThickness: isMobile ? 3 : 5
 });
 
 /**

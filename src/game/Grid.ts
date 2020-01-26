@@ -18,6 +18,7 @@ class Grid extends PIXI.Container {
     private tempDelay: number = 0;
     private totalReavealed: number = 0;
     private onceRevealed: number = 0;
+    private inTouch: boolean = false;
 
     constructor() {
         super();
@@ -82,8 +83,7 @@ class Grid extends PIXI.Container {
     private addEvents() {
         this.interactive = true;
         let click: string = isMobile ? "tap" : "click";
-        //TODO on mobile
-        let rightClick: string = isMobile ? "todo" : "rightclick";
+        let rightClick: string = isMobile ? "touchstart" : "rightclick";
 
         this.on(click, this.onClick);
         this.on(rightClick, this.onRightClick);
@@ -95,8 +95,7 @@ class Grid extends PIXI.Container {
     private removeEvents() {
         this.interactive = false;
         let click: string = isMobile ? "tap" : "click";
-        //TODO on mobile
-        let rightClick: string = isMobile ? "todo" : "rightclick";
+        let rightClick: string = isMobile ? "touchstart" : "rightclick";
 
         this.removeListener(click, this.onClick);
         this.removeListener(rightClick, this.onRightClick);
@@ -135,6 +134,13 @@ class Grid extends PIXI.Container {
      * @param evt 
      */
     private  onClick(evt) {
+        if(isMobile) {
+            //If long touched, ignore this click in mobile
+            if(!this.inTouch) {
+                return;
+            }
+            this.inTouch = false;
+        }
         let tile:Tile = this.getTileByEvent(evt);
         if(tile && tile.state == TILE_STATE.UNKNOWN) {
             if(tile.hasMine) {
@@ -166,6 +172,21 @@ class Grid extends PIXI.Container {
      * @param evt 
      */
     private onRightClick(evt) {
+        if(!isMobile) {
+            this.handleRightClick(evt);
+        //In mobile, long press means right-click    
+        } else {
+            this.inTouch = true;
+            setTimeout(() => {
+                if(this.inTouch) {
+                    this.inTouch = false;
+                    this.handleRightClick(evt);
+                }
+            }, 500);
+        }
+        
+    }
+    private handleRightClick(evt) {
         let tile:Tile = this.getTileByEvent(evt);
         if(tile) {
             if(tile.state == TILE_STATE.FLAG) {

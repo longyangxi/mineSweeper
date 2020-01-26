@@ -1,7 +1,7 @@
 import { assets } from '../../assets/loader';
 import * as PIXI from 'pixi.js';
 import Grid from "./Grid";
-import { BACKGROUND, MINES_COUNT, titleStyle, textStyle} from "./Const";
+import { BACKGROUND, MINES_COUNT, titleStyle, textStyle, isMobile} from "./Const";
 
 enum GameState {
     IDLE,
@@ -78,13 +78,13 @@ export class Game extends PIXI.Application {
 
         //Time text
         this.timeTxt = new PIXI.Text('Time: 0', textStyle);
-        this.timeTxt.x = title.x + 250;
+        this.timeTxt.x = title.x + (isMobile ? 165 : 250);
         this.timeTxt.y = title.y + 5;
         this.stage.addChild(this.timeTxt);
 
         //Mines text
         this.minesTxt = new PIXI.Text('Mines: ' + this.mines, textStyle);
-        this.minesTxt.x = this.timeTxt.x + 150;
+        this.minesTxt.x = this.timeTxt.x + + (isMobile ? 85 : 150);
         this.minesTxt.y = this.timeTxt.y;
         this.stage.addChild(this.minesTxt);
 

@@ -2,6 +2,12 @@
 import * as PIXI from 'pixi.js';
 import Particles = require('pixi-particles');
 import * as particleJson from "../../assets/particles/particle.json";
+import {TILE_SIZE} from "./Const";
+
+//Adjust the scale of the particle according to the tile size
+let scale: number = TILE_SIZE / 64;
+particleJson.scale.start *= scale;
+particleJson.scale.end *= scale;
 
 class Particle extends Particles.Emitter
 {
