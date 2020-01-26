@@ -10,7 +10,7 @@ npm run start
 http://127.0.0.1:1234/
 
 # assets
-https://opengameart.org/content/minesweeper-tile-set
+https://github.com/vilbeyli/Minesweeper
 
 # pixi-particle
 https://github.com/pixijs/pixi-particle/
