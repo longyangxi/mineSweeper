@@ -11,7 +11,7 @@ class Grid extends PIXI.Container {
     public readonly w: number = GRID_SIZE.w;
     public readonly h: number = GRID_SIZE.h;
     public readonly wx: number = this.w * TILE_SIZE;
-    public readonly wy: number = this.h * TILE_SIZE;
+    public readonly hx: number = this.h * TILE_SIZE;
 
     private tiles: Tile[][] = [];
     private prevTile: Tile;
@@ -139,7 +139,7 @@ class Grid extends PIXI.Container {
     public updatePosition() {
         let windowWidth: number = window.innerWidth;
         let windowHeight: number = window.innerHeight;
-        this.position.set((windowWidth - this.wx)/2, (windowHeight - this.wy)/2);
+        this.position.set((windowWidth - this.wx)/2, (windowHeight - this.hx)/2);
     }
     /**
      * Find how many mines around this tile

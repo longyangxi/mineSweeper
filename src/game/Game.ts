@@ -1,6 +1,8 @@
 import { assets } from '../../assets/loader';
 import * as PIXI from 'pixi.js';
 import Grid from "./Grid";
+import { BACKGROUND, TILE_SIZE, MINES_COUNT} from "./Const";
+import {titleStyle, textStyle} from "./TextStyle";
 
 /**
  * The game
@@ -11,7 +13,7 @@ export class Game extends PIXI.Application {
 
     constructor(parent: HTMLElement, width: number, height: number) {
 
-        super({width, height, backgroundColor : 0x000000});
+        super({width, height, backgroundColor : 0x000000, antialias: true});
         // Hack for parcel HMR
         parent.replaceChild(this.view, parent.lastElementChild); 
 
@@ -28,7 +30,7 @@ export class Game extends PIXI.Application {
         loader.add(assets.broken);
 
         // Load assets
-        loader.load(this.onAssetsLoaded.bind(this));
+        loader.load(this.initGame.bind(this));
 
         //update grid position when window resized
         window.addEventListener("resize", this.onResize.bind(this), false);
@@ -42,16 +44,39 @@ export class Game extends PIXI.Application {
             this.grid.updatePosition();
         }
     }
-    private onAssetsLoaded() {
+    private initGame() {
         //hide loading
         if(document.getElementById("gameLoading")) document.body.removeChild(document.getElementById("gameLoading"));
 
-        // let bgTexture = PIXI.Texture.from(assets.bg);
-        // let bg = new PIXI.Sprite(bgTexture);
-        // this.app.stage.addChild(bg);
-
+        //Add tiles grid
         this.grid = new Grid();
         this.stage.addChild(this.grid);    
+
+        //Add background
+        const header: PIXI.Graphics = new PIXI.Graphics();
+        header.beginFill(BACKGROUND.color);
+        header.drawRect(0, 0, this.grid.wx + BACKGROUND.border * 2, this.grid.hx + BACKGROUND.top +  + BACKGROUND.border);
+        header.endFill();
+        header.position.set(this.grid.x - BACKGROUND.border, this.grid.y - BACKGROUND.top);
+        this.stage.addChildAt(header, 0);
+
+        //Title
+        const title = new PIXI.Text('MineSweeper', titleStyle);
+        title.x = this.grid.x + BACKGROUND.border;
+        title.y = this.grid.y - BACKGROUND.top + BACKGROUND.border;
+        this.stage.addChild(title);
+
+        //Time text
+        const time = new PIXI.Text('Time: 0', textStyle);
+        time.x = title.x + 250;
+        time.y = title.y + 5;
+        this.stage.addChild(time);
+
+        //Mines text
+        const mines = new PIXI.Text('Mines: ' + MINES_COUNT, textStyle);
+        mines.x = time.x + 150;
+        mines.y = time.y;
+        this.stage.addChild(mines);
     }
 
 }

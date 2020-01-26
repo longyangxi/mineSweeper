@@ -51,6 +51,12 @@ export const NEIGHBOR_TILES = [
     {x: -1, y: 0}
 ];
 
+export const BACKGROUND = {
+    color: 0x595959,
+    border:  10,
+    top: 64
+}
+
 /**
  * Check if the device is mobile
  */
