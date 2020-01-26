@@ -24,7 +24,7 @@ export const MINES_COUNT: number = 10;
 /**
  * Tile particle delay (ms)
  */
-export const TILE_PARTILCE_DELAY: number = 20;
+export const TILE_PARTILCE_DELAY: number = 50;
 
 /**
  * Several Tile States

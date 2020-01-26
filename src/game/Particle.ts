@@ -1,7 +1,7 @@
 
 import * as PIXI from 'pixi.js';
 import Particles = require('pixi-particles');
-import * as particleJson from "../../assets/particles/broken.json";
+import * as particleJson from "../../assets/particles/particle.json";
 
 class Particle extends Particles.Emitter
 {

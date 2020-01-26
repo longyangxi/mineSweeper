@@ -15,7 +15,7 @@ class Grid extends PIXI.Container {
 
     private tiles: Tile[][] = [];
     private prevTile: Tile;
-    private tempIndex: number = 0;
+    private tempDelay: number = 0;
 
     constructor() {
         super();
@@ -100,8 +100,8 @@ class Grid extends PIXI.Container {
             if(tile.hasMine) {
                 console.log("game over")
             } else {
-                this.tempIndex = 0;
-                let texture = PIXI.Texture.from(assets.broken);
+                this.tempDelay = 0;
+                let texture = PIXI.Texture.from(assets.rect);
                 this.findBlankNeighbors(tile, texture);
             }
         }
@@ -113,7 +113,11 @@ class Grid extends PIXI.Container {
     private onRightClick(evt) {
         let tile:Tile = this.getTileByEvent(evt);
         if(tile) {
-            if(tile.state == TILE_STATE.FLAG) tile.state = TILE_STATE.UNKNOWN;
+            if(tile.state == TILE_STATE.FLAG) {
+                tile.state = TILE_STATE.UNKNOWN;
+                let texture = PIXI.Texture.from(assets.flag);
+                Particle.show(this, texture, tile.position, this.tempDelay);
+            }
             else if(tile.state == TILE_STATE.UNKNOWN) tile.state = TILE_STATE.FLAG;
             // console.log("right click", tpos.x, tpos.y);
         }
@@ -164,10 +168,10 @@ class Grid extends PIXI.Container {
      * @param tile 
      */
     public findBlankNeighbors(tile: Tile, texture: PIXI.Texture) {
-        let delay: number = TILE_PARTILCE_DELAY * this.tempIndex++;
         if(tile.state != TILE_STATE.KNOWN) {
-            Particle.show(this, texture, tile.position, delay);
-            tile.delayState(TILE_STATE.KNOWN, delay)
+            this.tempDelay += TILE_PARTILCE_DELAY;
+            Particle.show(this, texture, tile.position, this.tempDelay);
+            tile.delayState(TILE_STATE.KNOWN, this.tempDelay)
         }
         if(tile.minesNumber > 0) return;
         var i = NEIGHBOR_TILES.length;
@@ -180,9 +184,9 @@ class Grid extends PIXI.Container {
             nTile = this.tiles[tx][ty];
             if(nTile.hasMine) continue;
             if(nTile.state == TILE_STATE.KNOWN) continue;
-            delay = TILE_PARTILCE_DELAY * this.tempIndex++;
-            nTile.delayState(TILE_STATE.KNOWN, delay)
-            Particle.show(this, texture, nTile.position, delay)
+            this.tempDelay += TILE_PARTILCE_DELAY;
+            nTile.delayState(TILE_STATE.KNOWN, this.tempDelay)
+            Particle.show(this, texture, nTile.position, this.tempDelay)
             if(nTile.minesNumber == 0) {
                 this.findBlankNeighbors(nTile, texture);
             }

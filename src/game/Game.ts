@@ -26,8 +26,8 @@ export class Game extends PIXI.Application {
         tiles.map(path => {
             loader.add(path);
         })
-        // loader.add(assets.bg);
-        loader.add(assets.broken);
+        loader.add(assets.rect);
+        loader.add(assets.flag);
 
         // Load assets
         loader.load(this.initGame.bind(this));

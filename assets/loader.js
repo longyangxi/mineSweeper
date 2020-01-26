@@ -1,7 +1,9 @@
-import broken from './particles/broken.png';
+import rect from './particles/rect.png';
+import flag from './particles/flag.png';
 import tiles from './tiles/*.png';
 
 export const assets = {
     tiles: Object.values(tiles),
-    broken: broken
+    rect: rect,
+    flag: flag
 };
