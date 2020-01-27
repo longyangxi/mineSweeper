@@ -5,6 +5,8 @@ A mineSweeper game based on PIXI.js and TypeScript.
 ![Preview Image](https://raw.githubusercontent.com/longyangxi/mineSweeper/master/preview.jpeg)
 
 # test
+npm install
+
 npm run start
 
 http://127.0.0.1:1234/
