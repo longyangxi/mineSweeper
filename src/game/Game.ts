@@ -19,6 +19,8 @@ export class Game extends PIXI.Application {
     public gameState: GameState = GameState.IDLE;
     private grid: Grid;
     private mines: number = MINES_COUNT;
+    private header: PIXI.Graphics;
+    private titleTxt: PIXI.Text;
     private minesTxt: PIXI.Text;
     private timeTxt: PIXI.Text;
     private tutoTxt: PIXI.Text;
@@ -51,16 +53,11 @@ export class Game extends PIXI.Application {
         // Load assets
         loader.load(this.initGame.bind(this));
         //update grid position when window resized
-        window.addEventListener("resize", this.onResize.bind(this), false);
+        window.addEventListener("resize", this.updateLayout.bind(this), false);
 
         //No right click menu
         document.oncontextmenu = function() {
             return false;
-        }
-    }
-    private onResize() {
-        if(this.grid) {
-            this.grid.updatePosition();
         }
     }
     private initGame() {
@@ -72,52 +69,44 @@ export class Game extends PIXI.Application {
         this.stage.addChild(this.grid);    
 
         //Add background
-        const header: PIXI.Graphics = new PIXI.Graphics();
-        header.beginFill(BACKGROUND.color);
-        header.drawRect(0, 0, this.grid.wx + BACKGROUND.border * 2, this.grid.hx + BACKGROUND.top +  + BACKGROUND.border);
-        header.endFill();
-        header.position.set(this.grid.x - BACKGROUND.border, this.grid.y - BACKGROUND.top);
-        this.stage.addChildAt(header, 0);
+        this.header = new PIXI.Graphics();
+        this.header.beginFill(BACKGROUND.color);
+        this.header.drawRect(0, 0, this.grid.wx + BACKGROUND.border * 2, this.grid.hx + BACKGROUND.top +  + BACKGROUND.border);
+        this.header.endFill();
+        this.stage.addChildAt(this.header, 0);
 
         //Title
-        const title = new PIXI.Text('MineSweeper', titleStyle);
-        title.x = this.grid.x + BACKGROUND.border;
-        title.y = this.grid.y - BACKGROUND.top + BACKGROUND.border;
-        this.stage.addChild(title);
+        this.titleTxt = new PIXI.Text('MineSweeper', titleStyle);
+        this.stage.addChild(this.titleTxt);
 
         //Time text
         this.timeTxt = new PIXI.Text('Time: 0', textStyle);
-        this.timeTxt.x = title.x + (isMobile ? 165 : 250);
-        this.timeTxt.y = title.y + 5;
         this.stage.addChild(this.timeTxt);
 
         //Mines text
         this.minesTxt = new PIXI.Text('Mines: ' + this.mines, textStyle);
-        this.minesTxt.x = this.timeTxt.x + + (isMobile ? 85 : 150);
-        this.minesTxt.y = this.timeTxt.y;
         this.stage.addChild(this.minesTxt);
 
         //Tutorial text
         this.showTutorial();
         //Events
         this.addEvents();
+
+        this.updateLayout();
     }
-    showTutorial() {
-        let windowWidth: number = window.innerWidth;
-        let windowHeight: number = window.innerHeight;
+    private showTutorial() {
         this.tutoTxt = new PIXI.Text('TAP TO START', tutoStyle);
-        this.tutoTxt.x = (windowWidth - (isMobile ? 150 : 220))/2;
-        this.tutoTxt.y = (windowHeight - 50)/2;
         this.stage.addChild(this.tutoTxt);
+        this.updateLayout();
     }
-    hideTutorial() {
+    private hideTutorial() {
         if(this.tutoTxt != null) {
             this.tutoTxt.parent.removeChild(this.tutoTxt);
             this.tutoTxt = null;
             this.grid.removeListener(isMobile ? "touchstart" : "mousedown", this.hideTutorial.bind(this))
         }
     }
-    addEvents() {
+    private addEvents() {
         this.grid.on("onSolve", this.onSolve.bind(this));
         this.grid.on("onFlag" , this.updateMinesCount.bind(this))
         this.grid.on("onUnFlag", this.updateMinesCount.bind(this))
@@ -125,14 +114,14 @@ export class Game extends PIXI.Application {
         this.grid.on("onGameEnd", this.onGameEnd.bind(this));
         this.grid.on(isMobile ? "touchstart" : "mousedown", this.hideTutorial.bind(this))
     }
-    removeEvents() {
+    private removeEvents() {
         this.grid.removeListener("onSolve", this.onSolve.bind(this));
         this.grid.removeListener("onFlag" , this.updateMinesCount.bind(this))
         this.grid.removeListener("onUnFlag", this.updateMinesCount.bind(this))
         this.grid.removeListener("onGameOver", this.onGameOver.bind(this));
         this.grid.removeListener("onGameEnd", this.onGameEnd.bind(this));
     }
-    onSolve(count: number) {
+    private onSolve(count: number) {
         if(this.gameState == GameState.IDLE) {
             this.gameState = GameState.PLAY;
             this.startTimer();
@@ -147,7 +136,7 @@ export class Game extends PIXI.Application {
 
         Sound.play("click");
     }
-    onGameOver(win: boolean) {
+    private onGameOver(win: boolean) {
         win ? Sound.play("gameWin") : Sound.play("gameOver");
         if(!win) {
             Sound.play("wrong");
@@ -160,7 +149,7 @@ export class Game extends PIXI.Application {
         this.timeTxt.text = "Time: 0";
         this.timer = -1;
     }
-    onGameEnd() {
+    private onGameEnd() {
         alert(this.score > 0 ?  "You got score: " + this.score + " , play again?" : "You fail, play again?")
         this.removeEvents();
         this.grid = null;
@@ -174,19 +163,36 @@ export class Game extends PIXI.Application {
         this.minesTxt.text = "Mines: " +  this.mines;
         this.showTutorial();
     }
-
-    startTimer() {
+    private startTimer() {
         this.playedTime = 0;
         this.timer = setInterval(()=> {
             this.timeTxt.text = "Time: " + (++this.playedTime);
         }, 1000);
     }
-    updateMinesCount(flag: boolean) {
+    private updateMinesCount(flag: boolean) {
         flag ? Sound.play("flag") : Sound.play("unflag");
         flag ? this.mines -- : this.mines ++;
         if(this.mines < 0) this.mines = 0;
         else if(this.mines > MINES_COUNT) this.mines = MINES_COUNT;
         this.minesTxt.text = "Mines: " +  this.mines;
+    }
+
+    private updateLayout() {
+        let windowWidth: number = window.innerWidth;
+        let windowHeight: number = window.innerHeight;
+        this.renderer.resize(windowWidth, windowHeight);
+
+        if(this.grid) {
+            this.grid.updatePosition();
+            this.header.position.set(this.grid.x - BACKGROUND.border, this.grid.y - BACKGROUND.top);
+            this.titleTxt.position.set(this.grid.x + BACKGROUND.border, this.grid.y - BACKGROUND.top + BACKGROUND.border);
+            this.timeTxt.position.set(this.titleTxt.x + (isMobile ? 165 : 250), this.timeTxt.y = this.titleTxt.y + 5);
+            this.minesTxt.position.set(this.timeTxt.x + (isMobile ? 85 : 150), this.minesTxt.y = this.timeTxt.y);
+        }
+        
+        if(this.tutoTxt) {
+            this.tutoTxt.position.set((windowWidth - (isMobile ? 150 : 220))/2, (windowHeight - 50)/2);
+        }
     }
 
 }
