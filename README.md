@@ -15,7 +15,7 @@ http://127.0.0.1:1234/
 npm run build_serve
 
 # tips
-Click to reveal tile. 
+Click to clear a tile. 
 
 PC: right-click to flag; 
 
