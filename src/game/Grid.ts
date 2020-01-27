@@ -35,6 +35,7 @@ class Grid extends PIXI.Container {
         let i:number;
         let j:number;
         let tile:Tile;
+        let textures: PIXI.Texture[] = this.getTileTextures();
         //init tiles
         for(i = 0; i < this.w; i++) {
             this.tiles[i] = [];
@@ -42,7 +43,7 @@ class Grid extends PIXI.Container {
                 //check if this is a random mine tile
                 hasMine = mines.indexOf(i + j * this.w) > -1;
                 //new tile
-                tile = new Tile(i, j, hasMine);
+                tile = new Tile(textures, i, j, hasMine);
                 if(hasMine) this.mineTiles.push(tile);
                 this.addChild(tile);
                 this.tiles[i][j] = tile;
@@ -276,6 +277,19 @@ class Grid extends PIXI.Container {
         }
         return null;
     }
+
+    private getTileTextures(): PIXI.Texture[] {
+        //make sure the assets sort by name
+        let keys: string[] = Object.keys(assets.tiles);
+        keys.sort();
+        //init the textues
+        let textuers: PIXI.Texture[] = [];
+        for(let i = 0; i < keys.length; i++) {
+           textuers.push(PIXI.Texture.from(assets.tiles[keys[i]]));
+        }
+        return textuers;
+    }
+
     /**
      * If tx and ty are with the grid
      * @param tx 

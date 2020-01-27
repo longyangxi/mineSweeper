@@ -41,10 +41,10 @@ export class Game extends PIXI.Application {
         //init sounds
         Sound.init(assets.sounds);
 
-        //add tiles assets
-        assets.tiles.map(path => {
-            loader.add(path);
-        })
+        //Add tiles assets
+        for(let s in assets.tiles) {
+            loader.add(assets.tiles[s]);
+        }
 
         loader.add(assets.rect);
         loader.add(assets.flag);
@@ -53,6 +53,7 @@ export class Game extends PIXI.Application {
         //update grid position when window resized
         window.addEventListener("resize", this.onResize.bind(this), false);
 
+        //No right click menu
         document.oncontextmenu = function() {
             return false;
         }

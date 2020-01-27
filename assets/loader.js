@@ -4,7 +4,7 @@ import tiles from './tiles/*.png';
 import sounds from './sounds/*.wav';
 
 export const assets = {
-    tiles: Object.values(tiles),
+    tiles: tiles,//Object.values(tiles),
     rect: rect,
     flag: flag,
     sounds: sounds

@@ -32,9 +32,8 @@ class Tile extends PIXI.AnimatedSprite{
     private _tx:number = -1;
     private _ty:number = -1;
     
-    constructor(x: number = 0, y: number = 0, hasMine: boolean = false) {
-        // let tiles = assets.tiles;
-        super(assets.tiles.map(path => PIXI.Texture.from(path)));
+    constructor(textures: PIXI.Texture[], x: number = 0, y: number = 0, hasMine: boolean = false) {
+        super(textures);
         this.anchor.set(0.5);
         this.animationSpeed = 0.3;
         this.scale.set(TILE_SCALE);
