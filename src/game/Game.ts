@@ -2,6 +2,9 @@ import { assets } from '../../assets/loader';
 import * as PIXI from 'pixi.js';
 import Grid from "./Grid";
 import Shake from "./Shake";
+import {Howl, Howler} from 'howler';
+import Sound from './Sound';
+
 import { BACKGROUND, MINES_COUNT, titleStyle, tutoStyle, textStyle, isMobile} from "./Const";
 
 enum GameState {
@@ -31,20 +34,22 @@ export class Game extends PIXI.Application {
         parent.replaceChild(this.view, parent.lastElementChild); 
 
         // init Pixi loader
-        let loader = new PIXI.Loader();
+        let loader = PIXI.Loader.shared;
         // Add tile assets
-        let tiles = assets.tiles;
         console.log('tiles to load', assets);
 
-        tiles.map(path => {
+        //init sounds
+        Sound.init(assets.sounds);
+
+        //add tiles assets
+        assets.tiles.map(path => {
             loader.add(path);
         })
+
         loader.add(assets.rect);
         loader.add(assets.flag);
-
         // Load assets
         loader.load(this.initGame.bind(this));
-
         //update grid position when window resized
         window.addEventListener("resize", this.onResize.bind(this), false);
 
@@ -133,13 +138,20 @@ export class Game extends PIXI.Application {
         }
         //Simple calculate the score based on the revealed count
         this.score += count * count;
+
+        //Shake effect
         if(count > 5) {
             this.shake.start(this.grid);
         }
+
+        Sound.play("click");
     }
     onGameOver(win: boolean) {
+        win ? Sound.play("gameWin") : Sound.play("gameOver");
         if(!win) {
+            Sound.play("wrong");
             this.score = 0;
+            //Shake effect
             this.shake.start(this.grid);
         }
         this.gameState = GameState.OVER;
@@ -169,6 +181,7 @@ export class Game extends PIXI.Application {
         }, 1000);
     }
     updateMinesCount(flag: boolean) {
+        flag ? Sound.play("flag") : Sound.play("unflag");
         flag ? this.mines -- : this.mines ++;
         if(this.mines < 0) this.mines = 0;
         else if(this.mines > MINES_COUNT) this.mines = MINES_COUNT;
