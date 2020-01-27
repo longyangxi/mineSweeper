@@ -90,15 +90,24 @@ export class Game extends PIXI.Application {
         this.stage.addChild(this.minesTxt);
 
         //Tutorial text
+        this.showTutorial();
+        //Events
+        this.addEvents();
+    }
+    showTutorial() {
         let windowWidth: number = window.innerWidth;
         let windowHeight: number = window.innerHeight;
         this.tutoTxt = new PIXI.Text('TAP TO START', tutoStyle);
         this.tutoTxt.x = (windowWidth - (isMobile ? 150 : 220))/2;
         this.tutoTxt.y = (windowHeight - 50)/2;
         this.stage.addChild(this.tutoTxt);
-
-        //Events
-        this.addEvents();
+    }
+    hideTutorial() {
+        if(this.tutoTxt != null) {
+            this.tutoTxt.parent.removeChild(this.tutoTxt);
+            this.tutoTxt = null;
+            this.grid.removeListener(isMobile ? "touchstart" : "mousedown", this.hideTutorial.bind(this))
+        }
     }
     addEvents() {
         this.grid.on("onSolve", this.onSolve.bind(this));
@@ -106,6 +115,7 @@ export class Game extends PIXI.Application {
         this.grid.on("onUnFlag", this.updateMinesCount.bind(this))
         this.grid.on("onGameOver", this.onGameOver.bind(this));
         this.grid.on("onGameEnd", this.onGameEnd.bind(this));
+        this.grid.on(isMobile ? "touchstart" : "mousedown", this.hideTutorial.bind(this))
     }
     removeEvents() {
         this.grid.removeListener("onSolve", this.onSolve.bind(this));
@@ -117,8 +127,6 @@ export class Game extends PIXI.Application {
     onSolve(count: number) {
         if(this.gameState == GameState.IDLE) {
             this.gameState = GameState.PLAY;
-            this.tutoTxt.parent.removeChild(this.tutoTxt);
-            this.tutoTxt = null;
             this.startTimer();
         }
         //Simple calculate the score based on the revealed count
@@ -142,7 +150,8 @@ export class Game extends PIXI.Application {
         this.grid = new Grid();
         this.stage.addChild(this.grid);  
         this.addEvents();
-        this.minesTxt.text = "Mines: " +  this.mines
+        this.minesTxt.text = "Mines: " +  this.mines;
+        this.showTutorial();
     }
 
     startTimer() {
