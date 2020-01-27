@@ -1,6 +1,7 @@
 import { assets } from '../../assets/loader';
 import * as PIXI from 'pixi.js';
 import Grid from "./Grid";
+import Shake from "./Shake";
 import { BACKGROUND, MINES_COUNT, titleStyle, tutoStyle, textStyle, isMobile} from "./Const";
 
 enum GameState {
@@ -21,6 +22,7 @@ export class Game extends PIXI.Application {
     private playedTime: number = 0;
     private timer: number = -1;
     private score: number = 0;
+    private shake: Shake = new Shake();
 
     constructor(parent: HTMLElement, width: number, height: number) {
 
@@ -131,9 +133,15 @@ export class Game extends PIXI.Application {
         }
         //Simple calculate the score based on the revealed count
         this.score += count * count;
+        if(count > 5) {
+            this.shake.start(this.grid);
+        }
     }
     onGameOver(win: boolean) {
-        if(!win) this.score = 0;
+        if(!win) {
+            this.score = 0;
+            this.shake.start(this.grid);
+        }
         this.gameState = GameState.OVER;
         clearInterval(this.timer);
         this.timeTxt.text = "Time: 0";
