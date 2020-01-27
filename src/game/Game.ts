@@ -152,6 +152,7 @@ export class Game extends PIXI.Application {
     private onGameEnd() {
         alert(this.score > 0 ?  "You got score: " + this.score + " , play again?" : "You fail, play again?")
         this.removeEvents();
+        this.grid.parent.removeChild(this.grid);
         this.grid = null;
         this.score = 0;
         this.playedTime = 0;
@@ -189,7 +190,7 @@ export class Game extends PIXI.Application {
             this.timeTxt.position.set(this.titleTxt.x + (isMobile ? 165 : 250), this.timeTxt.y = this.titleTxt.y + 5);
             this.minesTxt.position.set(this.timeTxt.x + (isMobile ? 85 : 150), this.minesTxt.y = this.timeTxt.y);
         }
-        
+
         if(this.tutoTxt) {
             this.tutoTxt.position.set((windowWidth - (isMobile ? 150 : 220))/2, (windowHeight - 50)/2);
         }
