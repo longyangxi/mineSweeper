@@ -1,7 +1,7 @@
 import * as PIXI from "pixi.js";
 import Tile from './Tile';
 import { assets } from "../../assets/loader";
-import { GRID_SIZE, TILE_SIZE, isMobile, TILE_STATE, MINES_COUNT, NEIGHBOR_TILES, TILE_PARTILCE_DELAY} from "./Const";
+import { GRID_SIZE, TILE_SIZE, isMobile, TILE_STATE, MINES_COUNT, NEIGHBOR_TILES, TILE_PARTILCE_DELAY, BACKGROUND} from "./Const";
 
 /**
  * The grid container
@@ -220,7 +220,7 @@ class Grid extends PIXI.Container {
     public updatePosition() {
         let windowWidth: number = window.innerWidth;
         let windowHeight: number = window.innerHeight;
-        this.position.set((windowWidth - this.wx)/2, (windowHeight - this.hx)/2);
+        this.position.set((windowWidth - this.wx)/2, (windowHeight + BACKGROUND.top - this.hx)/2);
     }
     /**
      * Find how many mines around this tile

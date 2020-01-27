@@ -24,10 +24,11 @@ export const BACKGROUND = {
     top: 64
 }
 
+const maxGridWidth: number = isMobile ? window.innerWidth : 750;
 /**
  * The tile size in pixel in game scene
  */
-export const TILE_SIZE: number = isMobile ? Math.round((window.innerWidth - 2 * BACKGROUND.border) / GRID_SIZE.w) : 64;
+export const TILE_SIZE: number = Math.round((maxGridWidth - 2 * BACKGROUND.border) / GRID_SIZE.w);
 
 /**
  * Tile particle delay (ms)
