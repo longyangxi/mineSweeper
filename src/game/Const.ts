@@ -59,6 +59,15 @@ export const NEIGHBOR_TILES = [
     {x: -1, y: 0}
 ];
 
+export const tutoStyle = new PIXI.TextStyle({
+    fontFamily: 'Arial',
+    fontSize: isMobile ? 20 : 30,
+    fontWeight: 'bold',
+    fill: ['#ffffff', '#cccccc'],
+    stroke: '#4a1850',
+    strokeThickness: isMobile ? 3 : 5
+});
+
 export const titleStyle = new PIXI.TextStyle({
     fontFamily: 'Arial',
     fontSize: isMobile ? 20 : 30,

@@ -1,7 +1,7 @@
 import { assets } from '../../assets/loader';
 import * as PIXI from 'pixi.js';
 import Grid from "./Grid";
-import { BACKGROUND, MINES_COUNT, titleStyle, textStyle, isMobile} from "./Const";
+import { BACKGROUND, MINES_COUNT, titleStyle, tutoStyle, textStyle, isMobile} from "./Const";
 
 enum GameState {
     IDLE,
@@ -17,6 +17,7 @@ export class Game extends PIXI.Application {
     private mines: number = MINES_COUNT;
     private minesTxt: PIXI.Text;
     private timeTxt: PIXI.Text;
+    private tutoTxt: PIXI.Text;
     private playedTime: number = 0;
     private timer: number = -1;
     private score: number = 0;
@@ -88,6 +89,14 @@ export class Game extends PIXI.Application {
         this.minesTxt.y = this.timeTxt.y;
         this.stage.addChild(this.minesTxt);
 
+        //Tutorial text
+        let windowWidth: number = window.innerWidth;
+        let windowHeight: number = window.innerHeight;
+        this.tutoTxt = new PIXI.Text('TAP TO START', tutoStyle);
+        this.tutoTxt.x = (windowWidth - (isMobile ? 150 : 220))/2;
+        this.tutoTxt.y = (windowHeight - 50)/2;
+        this.stage.addChild(this.tutoTxt);
+
         //Events
         this.addEvents();
     }
@@ -108,6 +117,8 @@ export class Game extends PIXI.Application {
     onSolve(count: number) {
         if(this.gameState == GameState.IDLE) {
             this.gameState = GameState.PLAY;
+            this.tutoTxt.parent.removeChild(this.tutoTxt);
+            this.tutoTxt = null;
             this.startTimer();
         }
         //Simple calculate the score based on the revealed count
